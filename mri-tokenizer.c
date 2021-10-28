@@ -25,7 +25,7 @@ void mri_tokenizer_print_token(void *token)
     }
 
     // keywords
-    map_token("\"`def'\"", "kDEF");
+    map_token("\"`class'\"", "kCLASS");
     map_token("\"`module'\"", "kMODULE");
     map_token("\"`def'\"", "kDEF");
     map_token("\"`undef'\"", "kUNDEF");
