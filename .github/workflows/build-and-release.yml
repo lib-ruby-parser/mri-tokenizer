@@ -1,0 +1,62 @@
+name: build-and-release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    name: build-and-test
+    runs-on: ${{ matrix.build.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - { os: ubuntu-latest, output: mri-tokenizer-x86_64-unknown-linux-gnu }
+          - { os: macos-latest,  output: mri-tokenizer-x86_64-apple-darwin }
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: build and test
+        uses: ./.github/actions/build-and-test
+        with:
+          base-ruby-version: "3.0.0"
+
+      - name: rename mri-tokenizer
+        run: mv ruby/mri-tokenizer ${{ matrix.build.output }}
+
+      - name: upload ${{ matrix.build.output }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build.output }}
+          path: ${{ matrix.build.output }}
+
+  release:
+    name: release
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: download mri-tokenizer-x86_64-unknown-linux-gnu artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: mri-tokenizer-x86_64-unknown-linux-gnu
+
+      - name: download mri-tokenizer-x86_64-apple-darwin artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: mri-tokenizer-x86_64-apple-darwin
+
+      - name: build release_notes.md
+        run: |
+          echo "Build date: $(date)" > release_notes.md
+
+      - name: release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "mri-tokenizer-*"
+          bodyFile: release_notes.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: latest
