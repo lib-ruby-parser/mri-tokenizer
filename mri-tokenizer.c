@@ -180,6 +180,7 @@ void mri_tokenizer_print_token(void *token)
     map_token("'\\n'", "tNL");
 
     map_token("\"end-of-input\"", "EOF");
+    map_token("\"invalid token\"", "EOF");
     printf("%s\n", token_name);
 }
 
