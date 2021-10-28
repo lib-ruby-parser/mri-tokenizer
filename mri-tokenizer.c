@@ -49,9 +49,9 @@ void mri_tokenizer_print_token(void *token)
     map_token("\"`retry'\"", "kRETRY");
     map_token("\"`in'\"", "kIN");
     map_token("\"`do'\"", "kDO");
-    map_token("\"`do'\" for condition", "kDO_COND");
-    map_token("\"`do'\" for block", "kDO_BLOCK");
-    map_token("\"`do'\" for lambda", "kDO_LAMBDA");
+    map_token("\"`do' for condition\"", "kDO_COND");
+    map_token("\"`do' for block\"", "kDO_BLOCK");
+    map_token("\"`do' for lambda\"", "kDO_LAMBDA");
     map_token("\"`return'\"", "kRETURN");
     map_token("\"`yield'\"", "kYIELD");
     map_token("\"`super'\"", "kSUPER");
@@ -179,7 +179,7 @@ void mri_tokenizer_print_token(void *token)
     map_token("' '", "tSPACE");
     map_token("'\\n'", "tNL");
 
-    map_token("\"end-of-input\"", "END_OF_INPUT");
+    map_token("\"end-of-input\"", "EOF");
     printf("%s\n", token_name);
 }
 
