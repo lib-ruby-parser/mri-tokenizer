@@ -1,0 +1,51 @@
+name: build and test
+description: build and test
+inputs:
+  base-ruby-version:
+    description: base ruby version
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.base-ruby-version }}
+
+    - name: clone ruby/master
+      shell: bash
+      run: git clone https://github.com/ruby/ruby.git --depth=1
+
+    - name: patch parse.y
+      env:
+        PARSE_Y_PATH: ruby/parse.y
+      shell: bash
+      run: ruby patch-parse-y.rb
+
+    - name: copy mri_tokenizer.c
+      shell: bash
+      run: cp mri_tokenizer.c ruby/
+
+    - name: create Makefile
+      shell: bash
+      run: |
+        cd ruby
+        autoconf
+        ./configure
+
+    - name: append mri_tokenizer.mk to Makefile
+      shell: bash
+      run: echo "include ../mri_tokenizer.mk" >> ruby/Makefile
+
+    - name: build mri_tokenizer
+      shell: bash
+      run: |
+        cd ruby
+        make objs
+        make mri_tokenizer
+
+    - name: test mri_tokenizer
+      env:
+        MRI_TOKENIZER: ./ruby/mri_tokenizer
+      shell: bash
+      run: ruby test/runner.rb

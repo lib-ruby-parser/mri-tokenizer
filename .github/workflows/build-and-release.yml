@@ -1,0 +1,32 @@
+name: build-and-release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-release:
+    name: build-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: build and test
+        uses: ./.github/actions/build-and-test
+        with:
+          base-ruby-version: "3.0.0"
+
+      - name: build release_notes.md
+        run: |
+          echo "Build date: $(date)" > release_notes.md
+
+      - name: release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: ruby/mri_tokenizer
+          bodyFile: release_notes.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: latest
